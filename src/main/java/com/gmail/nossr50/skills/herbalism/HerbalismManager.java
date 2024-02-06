@@ -39,13 +39,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class HerbalismManager extends SkillManager {
     public HerbalismManager(McMMOPlayer mcMMOPlayer) {
@@ -110,12 +106,12 @@ public class HerbalismManager extends SkillManager {
                 }
 
                 CheckBushAge checkBushAge = new CheckBushAge(blockState.getBlock(), mmoPlayer, xpReward);
-                checkBushAge.runTaskLater(mcMMO.p, 1);
+                mcMMO.p.getFoliaLib().getImpl().runAtLocationLater(blockState.getLocation(), checkBushAge, 1);
             }
         }
     }
 
-    private class CheckBushAge extends BukkitRunnable {
+    private class CheckBushAge extends CancellableRunnable {
 
         @NotNull Block block;
         @NotNull McMMOPlayer mmoPlayer;
@@ -314,7 +310,7 @@ public class HerbalismManager extends SkillManager {
             DelayedHerbalismXPCheckTask delayedHerbalismXPCheckTask = new DelayedHerbalismXPCheckTask(mmoPlayer, delayedChorusBlocks);
 
             //Large delay because the tree takes a while to break
-            delayedHerbalismXPCheckTask.runTaskLater(mcMMO.p, 0); //Calculate Chorus XP + Bonus Drops 1 tick later
+            mcMMO.p.getFoliaLib().getImpl().runAtEntity(mmoPlayer.getPlayer(), delayedHerbalismXPCheckTask); //Calculate Chorus XP + Bonus Drops 1 tick later
         }
     }
 
@@ -367,7 +363,7 @@ public class HerbalismManager extends SkillManager {
                  *
                  */
 
-                //If its a Crop we need to reward XP when its fully grown
+                //If it's a Crop we need to reward XP when its fully grown
                 if(isAgeableAndFullyMature(plantData) && !isBizarreAgeable(plantData)) {
                     //Add metadata to mark this block for double or triple drops
                     markForBonusDrops(brokenPlantState);
@@ -377,21 +373,17 @@ public class HerbalismManager extends SkillManager {
     }
 
     /**
-     * Checks if BlockData is ageable and we can trust that age for Herbalism rewards/XP reasons
+     * Checks if BlockData is bizarre ageable, and we cannot trust that age for Herbalism rewards/XP reasons
      * @param blockData target BlockData
-     * @return returns true if the ageable is trustworthy for Herbalism XP / Rewards
+     * @return returns true if the BlockData is a bizarre ageable for Herbalism XP / Rewards
      */
     public boolean isBizarreAgeable(BlockData blockData) {
         if(blockData instanceof Ageable) {
             //Catcus and Sugar Canes cannot be trusted
-            switch(blockData.getMaterial()) {
-                case CACTUS:
-                case KELP:
-                case SUGAR_CANE:
-                    return true;
-                default:
-                    return false;
-            }
+            return switch (blockData.getMaterial()) {
+                case CACTUS, KELP, SUGAR_CANE, BAMBOO -> true;
+                default -> false;
+            };
         }
 
         return false;
@@ -693,7 +685,7 @@ public class HerbalismManager extends SkillManager {
         for (HylianTreasure treasure : treasures) {
             if (skillLevel >= treasure.getDropLevel()
                     && RandomChanceUtil.checkRandomChanceExecutionSuccess(new RandomChanceSkillStatic(treasure.getDropChance(), getPlayer(), SubSkillType.HERBALISM_HYLIAN_LUCK))) {
-                if (!EventUtils.simulateBlockBreak(blockState.getBlock(), player, false)) {
+                if (!EventUtils.simulateBlockBreak(blockState.getBlock(), player)) {
                     return false;
                 }
                 blockState.setType(Material.AIR);
@@ -745,7 +737,7 @@ public class HerbalismManager extends SkillManager {
      */
     private void startReplantTask(int desiredCropAge, BlockBreakEvent blockBreakEvent, BlockState cropState, boolean isImmature) {
         //Mark the plant as recently replanted to avoid accidental breakage
-        new DelayedCropReplant(blockBreakEvent, cropState, desiredCropAge, isImmature).runTaskLater(mcMMO.p, 20 * 2);
+        mcMMO.p.getFoliaLib().getImpl().runAtLocationLater(blockBreakEvent.getBlock().getLocation(), new DelayedCropReplant(blockBreakEvent, cropState, desiredCropAge, isImmature), 2 * Misc.TICK_CONVERSION_FACTOR);
         blockBreakEvent.getBlock().setMetadata(MetadataConstants.METADATA_KEY_REPLANT, new RecentlyReplantedCropMeta(mcMMO.p, true));
     }
 
@@ -773,34 +765,38 @@ public class HerbalismManager extends SkillManager {
         PlayerInventory playerInventory = player.getInventory();
         Material seed;
 
-        switch (blockState.getType()) {
-            case CARROTS:
-                seed = Material.CARROT;
+        switch (blockState.getType().getKey().getKey().toLowerCase(Locale.ROOT)) {
+            case "carrots":
+                seed = Material.matchMaterial("CARROT");
                 break;
 
-            case WHEAT:
-                seed = Material.WHEAT_SEEDS;
+            case "wheat":
+                seed = Material.matchMaterial("WHEAT_SEEDS");
                 break;
 
-            case NETHER_WART:
-                seed = Material.NETHER_WART;
+            case "nether_wart":
+                seed = Material.getMaterial("NETHER_WART");
                 break;
 
-            case POTATOES:
-                seed = Material.POTATO;
+            case "potatoes":
+                seed = Material.matchMaterial("POTATO");
                 break;
 
-            case BEETROOTS:
-                seed = Material.BEETROOT_SEEDS;
+            case "beetroots":
+                seed = Material.matchMaterial("BEETROOT_SEEDS");
                 break;
 
-            case COCOA:
-                seed = Material.COCOA_BEANS;
+            case "cocoa":
+                seed = Material.matchMaterial("COCOA_BEANS");
                 break;
 
+            case "torchflower":
+                seed = Material.matchMaterial("TORCHFLOWER_SEEDS");
+                break;
             default:
                 return false;
         }
+
 
         ItemStack seedStack = new ItemStack(seed);
 
@@ -852,17 +848,17 @@ public class HerbalismManager extends SkillManager {
             return true;
         }
 
-        switch (blockState.getType()) {
+        switch (blockState.getType().getKey().getKey()) {
 
-            case POTATOES:
-            case CARROTS:
-            case WHEAT:
+            case "potatoes":
+            case "carrots":
+            case "wheat":
 
                     finalAge = getGreenThumbStage(greenTerra);
                 break;
 
-            case BEETROOTS:
-            case NETHER_WART:
+            case "beetroots":
+            case "nether_wart":
 
                 if (greenTerra || greenThumbStage > 2) {
                     finalAge = 2;
@@ -873,9 +869,9 @@ public class HerbalismManager extends SkillManager {
                 else {
                     finalAge = 0;
                 }
-               break;
+                break;
 
-            case COCOA:
+            case "cocoa":
 
                 if (getGreenThumbStage(greenTerra) >= 2) {
                     finalAge = 1;
@@ -888,6 +884,7 @@ public class HerbalismManager extends SkillManager {
             default:
                 return false;
         }
+
 
         //Start the delayed replant
         startReplantTask(finalAge, blockBreakEvent, blockState, false);

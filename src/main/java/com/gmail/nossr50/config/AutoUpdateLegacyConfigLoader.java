@@ -1,6 +1,7 @@
 package com.gmail.nossr50.config;
 
 import com.gmail.nossr50.mcMMO;
+import com.gmail.nossr50.util.LogUtils;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
@@ -10,28 +11,28 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class AutoUpdateConfigLoader extends ConfigLoader {
-    public AutoUpdateConfigLoader(String relativePath, String fileName, File dataFolder) {
+public abstract class AutoUpdateLegacyConfigLoader extends LegacyConfigLoader {
+    public AutoUpdateLegacyConfigLoader(String relativePath, String fileName, File dataFolder) {
         super(relativePath, fileName, dataFolder);
     }
 
-    public AutoUpdateConfigLoader(String fileName, File dataFolder) {
+    public AutoUpdateLegacyConfigLoader(String fileName, File dataFolder) {
         super(fileName, dataFolder);
     }
 
     @Deprecated
-    public AutoUpdateConfigLoader(String relativePath, String fileName) {
+    public AutoUpdateLegacyConfigLoader(String relativePath, String fileName) {
         super(relativePath, fileName);
     }
 
     @Deprecated
-    public AutoUpdateConfigLoader(String fileName) {
+    public AutoUpdateLegacyConfigLoader(String fileName) {
         super(fileName);
     }
 
     protected void saveConfig() {
         try {
-            mcMMO.p.getLogger().info("Saving changes to config file - " + fileName);
+            LogUtils.debug(mcMMO.p.getLogger(), "Saving changes to config file - " + fileName);
             config.options().indent(2);
             config.save(configFile);
         } catch (IOException e) {
@@ -58,9 +59,9 @@ public abstract class AutoUpdateConfigLoader extends ConfigLoader {
         oldKeys.removeAll(internalConfigKeys);
 
         if (!oldKeys.isEmpty()) {
-            mcMMO.p.debug("old key(s) in \"" + fileName + "\"");
+            LogUtils.debug(mcMMO.p.getLogger(), "old key(s) in \"" + fileName + "\"");
             for (String key : oldKeys) {
-                mcMMO.p.debug("  old-key:" + key);
+                LogUtils.debug(mcMMO.p.getLogger(), "  old-key:" + key);
             }
         }
 
@@ -73,7 +74,7 @@ public abstract class AutoUpdateConfigLoader extends ConfigLoader {
         }
 
         for (String key : newKeys) {
-            mcMMO.p.debug("Adding new key: " + key + " = " + internalConfig.get(key));
+            LogUtils.debug(mcMMO.p.getLogger(), "Adding new key: " + key + " = " + internalConfig.get(key));
             config.set(key, internalConfig.get(key));
         }
 

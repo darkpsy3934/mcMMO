@@ -1,26 +1,28 @@
 package com.gmail.nossr50.config;
 
 import com.gmail.nossr50.mcMMO;
+import com.gmail.nossr50.util.LogUtils;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.List;
 
-public abstract class ConfigLoader {
+@Deprecated
+public abstract class LegacyConfigLoader {
     protected final File configFile;
     protected final @NotNull File dataFolder;
     protected String fileName;
     protected YamlConfiguration config;
 
-    public ConfigLoader(String relativePath, String fileName, @NotNull File dataFolder) {
+    public LegacyConfigLoader(String relativePath, String fileName, @NotNull File dataFolder) {
         this.fileName = fileName;
         this.dataFolder = dataFolder;
         configFile = new File(dataFolder, relativePath + File.separator + fileName);
         loadFile();
     }
 
-    public ConfigLoader(String fileName, @NotNull File dataFolder) {
+    public LegacyConfigLoader(String fileName, @NotNull File dataFolder) {
         this.fileName = fileName;
         this.dataFolder = dataFolder;
         configFile = new File(dataFolder, fileName);
@@ -28,7 +30,7 @@ public abstract class ConfigLoader {
     }
 
     @Deprecated
-    public ConfigLoader(String relativePath, String fileName) {
+    public LegacyConfigLoader(String relativePath, String fileName) {
         this.fileName = fileName;
         configFile = new File(mcMMO.p.getDataFolder(), relativePath + File.separator + fileName);
         this.dataFolder = mcMMO.p.getDataFolder();
@@ -36,7 +38,7 @@ public abstract class ConfigLoader {
     }
 
     @Deprecated
-    public ConfigLoader(String fileName) {
+    public LegacyConfigLoader(String fileName) {
         this.fileName = fileName;
         configFile = new File(mcMMO.p.getDataFolder(), fileName);
         this.dataFolder = mcMMO.p.getDataFolder();
@@ -45,7 +47,7 @@ public abstract class ConfigLoader {
 
     protected void loadFile() {
         if (!configFile.exists()) {
-            mcMMO.p.getLogger().info("Creating mcMMO " + fileName + " File...");
+            LogUtils.debug(mcMMO.p.getLogger(), "Creating mcMMO " + fileName + " File...");
 
             try {
                 mcMMO.p.saveResource(fileName, false); // Normal files
@@ -53,7 +55,7 @@ public abstract class ConfigLoader {
                 mcMMO.p.saveResource(configFile.getParentFile().getName() + File.separator + fileName, false); // Mod files
             }
         } else {
-            mcMMO.p.getLogger().info("Loading mcMMO " + fileName + " File...");
+            LogUtils.debug(mcMMO.p.getLogger(), "Loading mcMMO " + fileName + " File...");
         }
 
         config = YamlConfiguration.loadConfiguration(configFile);
@@ -75,7 +77,7 @@ public abstract class ConfigLoader {
 
     protected void validate() {
         if (validateKeys()) {
-            mcMMO.p.debug("No errors found in " + fileName + "!");
+            LogUtils.debug(mcMMO.p.getLogger(), "No errors found in " + fileName + "!");
         } else {
             mcMMO.p.getLogger().warning("Errors were found in " + fileName + "! mcMMO was disabled!");
             mcMMO.p.getServer().getPluginManager().disablePlugin(mcMMO.p);

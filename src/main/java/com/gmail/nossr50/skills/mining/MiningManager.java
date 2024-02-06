@@ -1,7 +1,6 @@
 package com.gmail.nossr50.skills.mining;
 
 import com.gmail.nossr50.api.ItemSpawnReason;
-import com.gmail.nossr50.config.AdvancedConfig;
 import com.gmail.nossr50.config.experience.ExperienceConfig;
 import com.gmail.nossr50.datatypes.experience.XPGainReason;
 import com.gmail.nossr50.datatypes.interactions.NotificationType;
@@ -112,7 +111,7 @@ public class MiningManager extends SkillManager {
         Block targetBlock = player.getTargetBlock(BlockUtils.getTransparentBlocks(), BlastMining.MAXIMUM_REMOTE_DETONATION_DISTANCE);
 
         //Blast mining cooldown check needs to be first so the player can be messaged
-        if (!blastMiningCooldownOver() || targetBlock.getType() != Material.TNT || !EventUtils.simulateBlockBreak(targetBlock, player, true)) {
+        if (!blastMiningCooldownOver() || targetBlock.getType() != Material.TNT || !EventUtils.simulateBlockBreak(targetBlock, player)) {
             return;
         }
 
@@ -131,7 +130,7 @@ public class MiningManager extends SkillManager {
 
         mmoPlayer.setAbilityDATS(SuperAbilityType.BLAST_MINING, System.currentTimeMillis());
         mmoPlayer.setAbilityInformed(SuperAbilityType.BLAST_MINING, false);
-        new AbilityCooldownTask(mmoPlayer, SuperAbilityType.BLAST_MINING).runTaskLater(mcMMO.p, (long) SuperAbilityType.BLAST_MINING.getCooldown() * Misc.TICK_CONVERSION_FACTOR);
+        mcMMO.p.getFoliaLib().getImpl().runAtEntityLater(mmoPlayer.getPlayer(), new AbilityCooldownTask(mmoPlayer, SuperAbilityType.BLAST_MINING), (long) SuperAbilityType.BLAST_MINING.getCooldown() * Misc.TICK_CONVERSION_FACTOR);
     }
 
     /**
@@ -276,7 +275,7 @@ public class MiningManager extends SkillManager {
      * @return the Blast Mining tier
      */
     public int getDropMultiplier() {
-        if (mcMMO.p.getAdvancedConfig().isBlastMiningBonusDropsEnabled()) {
+        if (!mcMMO.p.getAdvancedConfig().isBlastMiningBonusDropsEnabled()) {
             return 0;
         }
 

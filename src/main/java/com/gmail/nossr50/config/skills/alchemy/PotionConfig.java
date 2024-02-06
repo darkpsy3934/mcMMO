@@ -1,8 +1,9 @@
 package com.gmail.nossr50.config.skills.alchemy;
 
-import com.gmail.nossr50.config.ConfigLoader;
+import com.gmail.nossr50.config.LegacyConfigLoader;
 import com.gmail.nossr50.datatypes.skills.alchemy.AlchemyPotion;
 import com.gmail.nossr50.mcMMO;
+import com.gmail.nossr50.util.LogUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -15,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PotionConfig extends ConfigLoader {
+public class PotionConfig extends LegacyConfigLoader {
     private static PotionConfig instance;
 
     private final List<ItemStack> concoctionsIngredientsTierOne = new ArrayList<>();
@@ -100,7 +101,7 @@ public class PotionConfig extends ConfigLoader {
             }
         }
 
-        mcMMO.p.debug("Loaded " + pass + " Alchemy potions, skipped " + fail + ".");
+        LogUtils.debug(mcMMO.p.getLogger(), "Loaded " + pass + " Alchemy potions, skipped " + fail + ".");
     }
 
     /**

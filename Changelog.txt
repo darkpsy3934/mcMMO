@@ -1,5 +1,85 @@
+Version 2.1.227
+    Fixed bug where some text would not be displayed to players (Adventure dependency update)
+    Repair sound effect from mcMMO can now be adjusted in Minecraft sound options (Thanks MithicSpirit)
+    Korean locale updated (Thanks Pindang2)
+    Simplified Chinese locale updated (Thanks YuanYuanOwO)
+
+    NOTES:
+    For those curious, mcMMO uses Adventure to do a lot of the message sending to players.
+    It typically needs updating when new versions of MC come out, sorry for the delay on my part.
+
+Version 2.1.226
+    Added Short_Grass to experience.yml for Herbalism
+    Updated Hylian Treasures "Bushes" alias to use short_grass when playing on new Minecraft versions
+    Fixed dirt_path and grass_block not being correctly whitelisted for herbalism abilities
+Version 2.1.225
+    Fixed text from mcMMO not being sent or displayed to the player
+    Updated Adventure dependencies
+    Added new API McMMOPlayerNotificationEvent.getPlayer
+
+Version 2.1.224
+    Updated to a new build of ACF to fix NoSuchFieldException locale
+    Improved Folia Support (Thanks HSGamer)
+    Fishing Shake has 8 ranks again
+
+    NOTES:
+    At some point Shake got reduced to 1 rank, this didn't really make sense as it was meant to be a skill that ranked up and got better over time.
+    It now has 8 ranks again, you may need to update advanced.yml and skillranks.yml to get the new ranks.
+Version 2.1.223
+    Folia Support added (Thanks to HSGamer, TechnicallyCoded, Rockyers, and Yomamaeatstoes)
+
+    NOTES: This update brings mcMMO to Folia, not all features are guaranteed to work but from limited testing it appears to be working well.
+Version 2.1.222
+    Fixed dupe exploit
+    Glow Lichen default XP changed from 200 to 5
+    A lot of mcMMO logging was moved from INFO to DEBUG, this should reduce the amount of noise in your logs and console
+
+    NOTES: If you want to see all logging messages, modify config.yml and set General.Verbose_Logging to true
+    You will have to adjust experience.yml to get the balance changes, or delete it to generate a new one
+Version 2.1.221
+    PAPI Support is now built into mcMMO and loads when mcMMO loads (as long as you have PAPI running)
+    Fixed blast mining bonus drops not working (Thanks warriiorrrr)
+    Added fail safes to prevent bonus drops metadata from lingering on blocks
+
+    NOTES: Placeholders were brought in from electroniccat's original work on a PAPI expansion for mcMMO, the placeholders are the same as a result
+    I will be adding a leaderboard placeholder in the next patch (most likely). Feel free to share details of what functionality you'd want from additional placeholders on discord.
+Version 2.1.220
+    (API) Added TreeFellerBlockBreakEvent class which extends FakeBlockBreakEvent (see notes), this is sent out during Tree Feller processing to allow other plugins to differentiate between Tree Feller and other fake block break events
+    Config files update automatically again
+    Default configs are now copied to plugins/mcMMO/defaults for easy reference
+    Fixed child skills counting towards power level in /inspect (Thanks Wariorrrr)
+
+    NOTES: For a while configs were not updating automatically as a rewrite of how config files were loaded was partially done, this is now complete and configs will update automatically again.
+    Fake block break events have been sent out historically by mcMMO to check other plugins for a players permission to break or place a block, Tree Feller will now specify via inheritance its own event type for this so mcMMO plugins can handle Tree Feller fake block break events differently if they so choose.
+    You can now view the default configs more easily as they are now copied to plugins/mcMMO/defaults, these configs will be overwritten on start up to match the default values of the config in the JAR
 Version 2.1.219
+    Fixed Fishing exploit protection being triggered inappropriately by other plugins (Thanks smudgge)
+    Fixed wiki url being incorrect in commands
+    Party loading is more resilient (Thanks Wariorrrr)
+    Fixed periods not being replaced whe nrenaming party (Thanks Wariorrrr)
+    Fixed Party Teleport NPE (Thanks Wariorrrr)
+    Added support for various new things from Minecraft 1.20
+    Fixed double drop issue with Beetroots
+    Added 'Camel' to taming experience in experience.yml
+    Added 'Sniffer' to taming experience in experience.yml
+    Added 'Snifflet' to taming experience in experience.yml
+    Added 'Pitcher_Plant' to bonus drops in config.yml
+    Added 'Torchflower' to bonus drops in config.yml
+    Added 'Pink_Petals' to bonus drops in config.yml
+    Added 'Cherry_Log' to bonus drops in config.yml
+    Added 'Cherry_Wood' to bonus drops in config.yml
+    Added 'Camel' to combat experience in experience.yml
+    Added 'Sniffer' to combat experience in experience.yml
+    Added 'Snifflet' to combat experience in experience.yml
+    Added 'Torchflower' to herbalism experience in experience.yml
+    Added 'Pitcher_Plant' to herbalism experience in experience.yml
+    Added 'Pink_Petals' to herbalism experience in experience.yml
+    Added 'Cherry_Log' to woodcutting experience in experience.yml
+    Added 'Cherry_Wood' to woodcutting experience in experience.yml
+    Added 'Stripped_Cherry_Log' to woodcutting experience in experience.yml
+    Added 'Stripped_Cherry_Wood' to woodcutting experience in experience.yml
     Added 'Skills.Mining.BlastMining.Bonus_Drops.Enabled' to advanced.yml to enable/disable bonus drops from Blast Mining
+    NOTE: There are plans to add experience and potentially subskills for discovering items via the new brushing mechanic, but this will have to wait for new Spigot API to become available
 
 Version 2.1.218
     Fixed locale pt_BR type (thanks MrPowerGamerBR)

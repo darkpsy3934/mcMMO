@@ -242,10 +242,10 @@ public class EntityListener implements Listener {
 
                 entity.setMetadata(MetadataConstants.METADATA_KEY_TRAVELING_BLOCK, MetadataConstants.MCMMO_METADATA_VALUE);
                 TravelingBlockMetaCleanup metaCleanupTask = new TravelingBlockMetaCleanup(entity, pluginRef);
-                metaCleanupTask.runTaskTimer(pluginRef, 20, 20*60); //6000 ticks is 5 minutes
+                mcMMO.p.getFoliaLib().getImpl().runAtEntityTimer(entity, metaCleanupTask, 20, 20*60); //6000 ticks is 5 minutes
             }
             else if (isTracked) {
-                mcMMO.getPlaceStore().setTrue(block);
+                BlockUtils.setUnnaturalBlock(block);
                 entity.removeMetadata(MetadataConstants.METADATA_KEY_TRAVELING_BLOCK, pluginRef);
             }
         } else if ((block.getType() == Material.REDSTONE_ORE || block.getType().getKey().getKey().equalsIgnoreCase("deepslate_redstone_ore"))) {

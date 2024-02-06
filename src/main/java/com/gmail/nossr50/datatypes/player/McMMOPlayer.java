@@ -577,7 +577,7 @@ public class McMMOPlayer implements Identified {
     }
 
     /**
-     * Whether or not a player is level capped
+     * Whether a player is level capped
      * If they are at the power level cap, this will return true, otherwise it checks their skill level
      * @param primarySkillType
      * @return
@@ -590,7 +590,7 @@ public class McMMOPlayer implements Identified {
     }
 
     /**
-     * Whether or not a player is power level capped
+     * Whether a player is power level capped
      * Compares their power level total to the current set limit
      * @return true if they have reached the power level cap
      */
@@ -912,7 +912,7 @@ public class McMMOPlayer implements Identified {
             return;
         }
 
-        //These values change depending on whether or not the server is in retro mode
+        //These values change depending on whether the server is in retro mode
         int abilityLengthVar = mcMMO.p.getAdvancedConfig().getAbilityLength();
         int abilityLengthCap = mcMMO.p.getAdvancedConfig().getAbilityLengthCap();
 
@@ -951,7 +951,7 @@ public class McMMOPlayer implements Identified {
         }
 
         setToolPreparationMode(tool, false);
-        new AbilityDisableTask(this, superAbilityType).runTaskLater(mcMMO.p, (long) ticks * Misc.TICK_CONVERSION_FACTOR);
+        mcMMO.p.getFoliaLib().getImpl().runAtEntityLater(player, new AbilityDisableTask(this, superAbilityType), (long) ticks * Misc.TICK_CONVERSION_FACTOR);
     }
 
     public void processAbilityActivation(@NotNull PrimarySkillType primarySkillType) {
@@ -1013,7 +1013,7 @@ public class McMMOPlayer implements Identified {
             }
 
             setToolPreparationMode(tool, true);
-            new ToolLowerTask(this, tool).runTaskLater(mcMMO.p, 4 * Misc.TICK_CONVERSION_FACTOR);
+            mcMMO.p.getFoliaLib().getImpl().runAtEntityLater(player, new ToolLowerTask(this, tool), 4 * Misc.TICK_CONVERSION_FACTOR);
         }
     }
 
